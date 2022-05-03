@@ -48,6 +48,21 @@ type KLine struct {
 	Interval string  `json:"interval"` // 1m
 }
 
+type KLineV2 struct {
+	Symbol    string  `json:"symbol"`   // BTCUSD
+	Start     int64   `json:"start"`    // start time of the candle 1572425640
+	End       int64   `json:"end"`      // end time of the candle 1572425700
+	Open      float64 `json:"open"`     // open price
+	Close     float64 `json:"close"`    // close price
+	High      float64 `json:"high"`     // max price
+	Low       float64 `json:"low"`      // min price
+	Volume    float64 `json:"volume"`   // volume 81790
+	Turnover  float64 `json:"turnover"` // turnover 8.889247899999999
+	Confirm   bool    `json:"confirm"`  // snapshot flag
+	CrossSeq  int     `json:"cross_seq"`
+	Timestamp int64   `json:"timestamp"` // cross time 1572425676958323
+}
+
 type Insurance struct {
 	Currency      string    `json:"currency"`
 	Timestamp     time.Time `json:"timestamp"`

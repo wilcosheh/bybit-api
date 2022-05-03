@@ -7,16 +7,17 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/chuckpreslar/emission"
-	"github.com/frankrap/bybit-api/recws"
-	"github.com/gorilla/websocket"
-	"github.com/tidwall/gjson"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/chuckpreslar/emission"
+	"github.com/frankrap/bybit-api/recws"
+	"github.com/gorilla/websocket"
+	"github.com/tidwall/gjson"
 )
 
 const (
@@ -39,6 +40,7 @@ const (
 const (
 	WSOrderBook25L1 = "orderBookL2_25" // 新版25档orderBook: order_book_25L1.BTCUSD
 	WSKLine         = "kline"          // K线: kline.BTCUSD.1m
+	WSKLineV2       = "klineV2"        // V2版本K线: klineV2.1.BTCUSD
 	WSTrade         = "trade"          // 实时交易: trade/trade.BTCUSD
 	WSInsurance     = "insurance"      // 每日保险基金更新: insurance
 	WSInstrument    = "instrument"     // 产品最新行情: instrument
@@ -290,6 +292,24 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 				return
 			}
 			b.processTrade(symbol, data...)
+		} else if strings.HasPrefix(topic, WSKLineV2) {
+			// klineV2.1.BTCUSD
+			topicArray := strings.Split(topic, ".")
+			if len(topicArray) != 3 {
+				return
+			}
+			symbol := topicArray[2]
+			raw := ret.Get("data").Raw
+			var data []*KLineV2
+			err := json.Unmarshal([]byte(raw), &data)
+			if err != nil {
+				log.Printf("BybitWs %v", err)
+				return
+			}
+			for _, kline := range data {
+				kline.Symbol = symbol
+			}
+			b.processKLineV2(symbol, data)
 		} else if strings.HasPrefix(topic, WSKLine) {
 			// kline.BTCUSD.1m
 			topicArray := strings.Split(topic, ".")

@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/frankrap/bybit-api/ws"
 	"log"
+
+	"github.com/frankrap/bybit-api/ws"
 )
 
 func main() {
@@ -21,7 +22,7 @@ func main() {
 	//b.Subscribe("trade.BTCUSD")
 	b.Subscribe(ws.WSTrade) // BTCUSD/ETHUSD/EOSUSD/XRPUSD
 	// K线
-	b.Subscribe(ws.WSKLine + ".BTCUSD.1m")
+	b.Subscribe(ws.WSKLineV2 + ".1.BTCUSD")
 	// 每日保险基金更新
 	b.Subscribe(ws.WSInsurance)
 	// 产品最新行情
@@ -36,7 +37,7 @@ func main() {
 
 	b.On(ws.WSOrderBook25L1, handleOrderBook)
 	b.On(ws.WSTrade, handleTrade)
-	b.On(ws.WSKLine, handleKLine)
+	b.On(ws.WSKLineV2, handleKLineV2)
 	b.On(ws.WSInsurance, handleInsurance)
 	b.On(ws.WSInstrument, handleInstrument)
 
@@ -58,8 +59,10 @@ func handleTrade(symbol string, data []*ws.Trade) {
 	log.Printf("handleTrade %v/%v", symbol, data)
 }
 
-func handleKLine(symbol string, data ws.KLine) {
-	log.Printf("handleKLine %v/%v", symbol, data)
+func handleKLineV2(symbol string, data []*ws.KLineV2) {
+	for _, kline := range data {
+		log.Printf("handleKLine %v/%v", symbol, kline)
+	}
 }
 
 func handleInsurance(currency string, data []*ws.Insurance) {
