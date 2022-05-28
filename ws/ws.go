@@ -5,7 +5,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -159,7 +158,7 @@ func (b *ByBitWS) SendCmd(cmd Cmd) error {
 func (b *ByBitWS) Send(msg string) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("BybitWs send error: %v", r))
+			err = fmt.Errorf("BybitWs send error: %v", r)
 		}
 	}()
 
@@ -389,7 +388,7 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 func (b *ByBitWS) handlePong() (err error) {
 	defer func() {
 		if r := recover(); r != nil {
-			err = errors.New(fmt.Sprintf("handlePong error: %v", r))
+			err = fmt.Errorf("handlePong error: %v", r)
 		}
 	}()
 	pongHandler := b.conn.PongHandler()
