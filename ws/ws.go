@@ -44,9 +44,10 @@ const (
 	WSInsurance     = "insurance"      // 每日保险基金更新: insurance
 	WSInstrument    = "instrument"     // 产品最新行情: instrument
 
-	WSPosition  = "position"  // 仓位变化: position
-	WSExecution = "execution" // 委托单成交信息: execution
-	WSOrder     = "order"     // 委托单的更新: order
+	WSPosition  = "position"   // 仓位变化: position
+	WSExecution = "execution"  // 委托单成交信息: execution
+	WSOrder     = "order"      // 委托单的更新: order
+	WSStopOrder = "stop_order" // 条件单的更新: stop_order
 
 	WSDisconnected = "disconnected" // WS断开事件
 )
@@ -380,6 +381,15 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 				return
 			}
 			b.processOrder(data...)
+		} else if topic == WSStopOrder {
+			raw := ret.Get("data").Raw
+			var data []*StopOrder
+			err := json.Unmarshal([]byte(raw), &data)
+			if err != nil {
+				log.Printf("BybitWs %v", err)
+				return
+			}
+			b.processStopOrder(data...)
 		}
 		return
 	}

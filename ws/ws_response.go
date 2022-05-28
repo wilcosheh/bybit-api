@@ -101,6 +101,26 @@ type Order struct {
 	CloseOnTrigger bool         `json:"close_on_trigger"`
 }
 
+type StopOrder struct {
+	OrderID        string       `json:"order_id"`
+	OrderLinkID    string       `json:"order_link_id"`
+	UserID         int64        `json:"user_id"`
+	Symbol         string       `json:"symbol"`
+	Side           string       `json:"side"`
+	OrderType      string       `json:"order_type"`
+	Price          sjson.Number `json:"price"`
+	Qty            float64      `json:"qty"`
+	TimeInForce    string       `json:"time_in_force"` // GoodTillCancel/ImmediateOrCancel/FillOrKill/PostOnly
+	CreateType     string       `json:"create_type"`
+	CancelType     string       `json:"cancel_type"`
+	OrderStatus    string       `json:"order_status"`
+	StopOrderType  string       `json:"stop_order_type"`
+	TriggerBy      string       `json:"trigger_by"`
+	TriggerPrice   sjson.Number `json:"trigger_pricee"`
+	CloseOnTrigger bool         `json:"close_on_trigger"`
+	Timestamp      time.Time    `json:"timestamp"`
+}
+
 type Execution struct {
 	Symbol      string    `json:"symbol"`
 	Side        string    `json:"side"`

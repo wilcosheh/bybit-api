@@ -55,3 +55,7 @@ func (b *ByBitWS) processExecution(data ...*Execution) {
 func (b *ByBitWS) processOrder(data ...*Order) {
 	b.Emit(WSOrder, data)
 }
+
+func (b *ByBitWS) processStopOrder(data ...*StopOrder) {
+	b.Emit(WSStopOrder, data)
+}
