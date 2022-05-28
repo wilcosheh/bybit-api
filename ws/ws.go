@@ -43,6 +43,7 @@ const (
 	WSTrade         = "trade"          // 实时交易: trade/trade.BTCUSD
 	WSInsurance     = "insurance"      // 每日保险基金更新: insurance
 	WSInstrument    = "instrument"     // 产品最新行情: instrument
+	WSLiquidation   = "liquidation"    // 強平推送: liquidation
 
 	WSPosition  = "position"   // 仓位变化: position
 	WSExecution = "execution"  // 委托单成交信息: execution
@@ -354,6 +355,15 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 				return
 			}
 			b.processInstrument(symbol, data...)
+		} else if topic == WSLiquidation {
+			raw := ret.Get("data").Raw
+			var data *Liquidation
+			err := json.Unmarshal([]byte(raw), &data)
+			if err != nil {
+				log.Printf("BybitWs %v", err)
+				return
+			}
+			b.processLiquidation(data)
 		} else if topic == WSPosition {
 			raw := ret.Get("data").Raw
 			var data []*Position

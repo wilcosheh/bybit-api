@@ -75,6 +75,14 @@ type Instrument struct {
 	IndexPrice float64 `json:"index_price"`
 }
 
+type Liquidation struct {
+	Symbol string       `json:"symbol"` // 合约类型
+	Side   string       `json:"side"`   // 被强平仓位的方向
+	Price  sjson.Number `json:"price"`  // 破产价格
+	Qty    float64      `json:"qty"`    // 交易數量
+	Time   int64        `json:"time"`   // 毫秒時間戳
+}
+
 type Order struct {
 	OrderID        string       `json:"order_id"`
 	OrderLinkID    string       `json:"order_link_id"`
