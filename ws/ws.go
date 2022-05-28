@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -198,7 +199,9 @@ func (b *ByBitWS) Start() error {
 				return
 			}
 
-			b.processMessage(messageType, data)
+			if err = b.processMessage(messageType, data); err != nil {
+				log.Printf("BybitWs process error: %v", err)
+			}
 		}
 	}()
 
@@ -246,7 +249,7 @@ func (b *ByBitWS) Auth() error {
 	return err
 }
 
-func (b *ByBitWS) processMessage(messageType int, data []byte) {
+func (b *ByBitWS) processMessage(messageType int, data []byte) error {
 	ret := gjson.ParseBytes(data)
 
 	if b.cfg.DebugMode {
@@ -270,16 +273,14 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 				var data []*OrderBookL2
 				err := json.Unmarshal([]byte(raw), &data)
 				if err != nil {
-					log.Printf("BybitWs %v", err)
-					return
+					return err
 				}
 				b.processOrderBookSnapshot(symbol, data...)
 			case "delta":
 				var delta OrderBookL2Delta
 				err := json.Unmarshal([]byte(raw), &delta)
 				if err != nil {
-					log.Printf("BybitWs %v", err)
-					return
+					return err
 				}
 				b.processOrderBookDelta(symbol, &delta)
 			}
@@ -289,23 +290,21 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 			var data []*Trade
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processTrade(symbol, data...)
 		} else if strings.HasPrefix(topic, WSKLineV2) {
 			// klineV2.1.BTCUSD
 			topicArray := strings.Split(topic, ".")
 			if len(topicArray) != 3 {
-				return
+				return errors.New("klineV2 topic format error")
 			}
 			symbol := topicArray[2]
 			raw := ret.Get("data").Raw
 			var data []*KLineV2
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			for _, kline := range data {
 				kline.Symbol = symbol
@@ -315,44 +314,41 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 			// kline.BTCUSD.1m
 			topicArray := strings.Split(topic, ".")
 			if len(topicArray) != 3 {
-				return
+				return errors.New("kline topic format error")
 			}
 			symbol := topicArray[1]
 			raw := ret.Get("data").Raw
 			var data KLine
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processKLine(symbol, data)
 		} else if strings.HasPrefix(topic, WSInsurance) {
 			// insurance.BTC
 			topicArray := strings.Split(topic, ".")
 			if len(topicArray) != 2 {
-				return
+				return errors.New("insurance topic format error")
 			}
 			currency := topicArray[1]
 			raw := ret.Get("data").Raw
 			var data []*Insurance
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processInsurance(currency, data...)
 		} else if strings.HasPrefix(topic, WSInstrument) {
 			topicArray := strings.Split(topic, ".")
 			if len(topicArray) != 2 {
-				return
+				return errors.New("instrument topic format error")
 			}
 			symbol := topicArray[1]
 			raw := ret.Get("data").Raw
 			var data []*Instrument
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processInstrument(symbol, data...)
 		} else if topic == WSLiquidation {
@@ -360,8 +356,7 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 			var data *Liquidation
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processLiquidation(data)
 		} else if topic == WSPosition {
@@ -369,8 +364,7 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 			var data []*Position
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processPosition(data...)
 		} else if topic == WSExecution {
@@ -378,8 +372,7 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 			var data []*Execution
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processExecution(data...)
 		} else if topic == WSOrder {
@@ -387,8 +380,7 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 			var data []*Order
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processOrder(data...)
 		} else if topic == WSStopOrder {
@@ -396,13 +388,14 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) {
 			var data []*StopOrder
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
-				log.Printf("BybitWs %v", err)
-				return
+				return err
 			}
 			b.processStopOrder(data...)
 		}
-		return
+		return nil
 	}
+
+	return nil
 }
 
 func (b *ByBitWS) handlePong() (err error) {
