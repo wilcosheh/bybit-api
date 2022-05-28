@@ -44,6 +44,10 @@ func (b *ByBitWS) processInstrument(symbol string, data ...*Instrument) {
 	b.Emit(WSInstrument, symbol, data)
 }
 
+func (b *ByBitWS) processLiquidation(symbol string, data *Liquidation) {
+	b.Emit(WSLiquidation, symbol, data)
+}
+
 func (b *ByBitWS) processPosition(data ...*Position) {
 	b.Emit(WSPosition, data)
 }
@@ -58,8 +62,4 @@ func (b *ByBitWS) processOrder(data ...*Order) {
 
 func (b *ByBitWS) processStopOrder(data ...*StopOrder) {
 	b.Emit(WSStopOrder, data)
-}
-
-func (b *ByBitWS) processLiquidation(data *Liquidation) {
-	b.Emit(WSLiquidation, data)
 }

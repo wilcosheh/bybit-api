@@ -351,14 +351,19 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) error {
 				return err
 			}
 			b.processInstrument(symbol, data...)
-		} else if topic == WSLiquidation {
+		} else if strings.HasPrefix(topic, WSLiquidation) {
+			topicArray := strings.Split(topic, ".")
+			if len(topicArray) != 2 {
+				return errors.New("liquidation topic format error")
+			}
+			symbol := topicArray[1]
 			raw := ret.Get("data").Raw
 			var data *Liquidation
 			err := json.Unmarshal([]byte(raw), &data)
 			if err != nil {
 				return err
 			}
-			b.processLiquidation(data)
+			b.processLiquidation(symbol, data)
 		} else if topic == WSPosition {
 			raw := ret.Get("data").Raw
 			var data []*Position
