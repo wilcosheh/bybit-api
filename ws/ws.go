@@ -407,6 +407,15 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) error {
 			if err != nil {
 				return err
 			}
+
+			for _, order := range data {
+				if order.Timestamp.IsZero() && !order.CreateTime.IsZero() {
+					order.Timestamp = order.CreateTime
+				}
+				if !order.Timestamp.IsZero() && order.CreateTime.IsZero() {
+					order.CreateTime = order.Timestamp
+				}
+			}
 			b.processOrder(data...)
 		} else if topic == WSStopOrder {
 			raw := ret.Get("data").Raw
