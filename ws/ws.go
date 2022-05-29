@@ -15,9 +15,9 @@ import (
 	"time"
 
 	"github.com/chuckpreslar/emission"
-	"github.com/frankrap/bybit-api/recws"
 	"github.com/gorilla/websocket"
 	"github.com/tidwall/gjson"
+	"github.com/wilcosheh/bybit-api/recws"
 )
 
 const (

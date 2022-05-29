@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/frankrap/bybit-api/ws"
+	"github.com/wilcosheh/bybit-api/ws"
 )
 
 func main() {

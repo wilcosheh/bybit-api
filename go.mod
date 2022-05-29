@@ -1,4 +1,4 @@
-module github.com/frankrap/bybit-api
+module github.com/wilcosheh/bybit-api
 
 go 1.17
 
