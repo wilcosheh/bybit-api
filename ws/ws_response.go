@@ -32,7 +32,7 @@ type Trade struct {
 	Price         float64   `json:"price"`
 	TickDirection string    `json:"tick_direction"`
 	TradeID       string    `json:"trade_id"`
-	CrossSeq      int       `json:"cross_seq"`
+	CrossSeq      int       `json:"cross_seq"` // only valid for inverse
 }
 
 type KLine struct {
@@ -49,18 +49,19 @@ type KLine struct {
 }
 
 type KLineV2 struct {
-	Symbol    string  `json:"symbol"`   // BTCUSD
-	Start     int64   `json:"start"`    // start time of the candle 1572425640
-	End       int64   `json:"end"`      // end time of the candle 1572425700
-	Open      float64 `json:"open"`     // open price
-	Close     float64 `json:"close"`    // close price
-	High      float64 `json:"high"`     // max price
-	Low       float64 `json:"low"`      // min price
-	Volume    float64 `json:"volume"`   // volume 81790
-	Turnover  float64 `json:"turnover"` // turnover 8.889247899999999
-	Confirm   bool    `json:"confirm"`  // snapshot flag
-	CrossSeq  int     `json:"cross_seq"`
-	Timestamp int64   `json:"timestamp"` // cross time 1572425676958323
+	Symbol    string  `json:"symbol"`    // 合约类型，从 topic 解析得到
+	Start     int64   `json:"start"`     // 开始时间戳（秒）
+	End       int64   `json:"end"`       // 结束时间戳（秒）
+	Open      float64 `json:"open"`      // 开盘价
+	Close     float64 `json:"close"`     // 收盘价
+	High      float64 `json:"high"`      // 最高价格
+	Low       float64 `json:"low"`       // 最低价格
+	Volume    float64 `json:"volume"`    // 交易量
+	Turnover  float64 `json:"turnover"`  // 成交金额 0.0013844
+	Confirm   bool    `json:"confirm"`   // 是否确认，为 true 表明是 k 线 最后一个 tick，否则只是一个快照数据，即中间价格
+	CrossSeq  int     `json:"cross_seq"` // 版本号
+	Interval  string  `json:"interval"`  // 周期，从 topic 解析得到： 1 3 5 15 30 60 120 240 360 D W M
+	Timestamp int64   `json:"timestamp"` // 结束时间戳（秒）
 }
 
 type Insurance struct {
@@ -84,29 +85,32 @@ type Liquidation struct {
 }
 
 type Order struct {
-	OrderID        string       `json:"order_id"`
-	OrderLinkID    string       `json:"order_link_id"`
-	Symbol         string       `json:"symbol"`
-	Side           string       `json:"side"`
-	OrderType      string       `json:"order_type"`
-	Price          sjson.Number `json:"price"`
-	Qty            float64      `json:"qty"`
-	TimeInForce    string       `json:"time_in_force"` // GoodTillCancel/ImmediateOrCancel/FillOrKill/PostOnly
-	CreateType     string       `json:"create_type"`
-	CancelType     string       `json:"cancel_type"`
-	OrderStatus    string       `json:"order_status"`
-	LeavesQty      float64      `json:"leaves_qty"`
-	CumExecQty     float64      `json:"cum_exec_qty"`
-	CumExecValue   sjson.Number `json:"cum_exec_value"`
-	CumExecFee     sjson.Number `json:"cum_exec_fee"`
-	Timestamp      time.Time    `json:"timestamp"`
-	TakeProfit     sjson.Number `json:"take_profit"`
-	StopLoss       sjson.Number `json:"stop_loss"`
-	TrailingStop   sjson.Number `json:"trailing_stop"`
-	TrailingActive sjson.Number `json:"trailing_active"`
-	LastExecPrice  sjson.Number `json:"last_exec_price"`
-	ReduceOnly     bool         `json:"reduce_only"`
-	CloseOnTrigger bool         `json:"close_on_trigger"`
+	OrderID        string       `json:"order_id"`         // 订单ID
+	OrderLinkID    string       `json:"order_link_id"`    // 自定义订单ID
+	Symbol         string       `json:"symbol"`           // 合约类型
+	Side           string       `json:"side"`             // 方向
+	OrderType      string       `json:"order_type"`       // 委托单价格类型，Limit/Market
+	Price          sjson.Number `json:"price"`            // 委托价格
+	Qty            float64      `json:"qty"`              // 委托数量
+	TimeInForce    string       `json:"time_in_force"`    // 执行策略，GoodTillCancel/ImmediateOrCancel/FillOrKill/PostOnly
+	CreateType     string       `json:"create_type"`      // 下单操作的触发场景
+	CancelType     string       `json:"cancel_type"`      // 取消操作的触发场景
+	OrderStatus    string       `json:"order_status"`     // 订单状态
+	LeavesQty      float64      `json:"leaves_qty"`       // 剩余委托数量
+	CumExecQty     float64      `json:"cum_exec_qty"`     // 累计成交数量
+	CumExecValue   sjson.Number `json:"cum_exec_value"`   // 累计成交价值
+	CumExecFee     sjson.Number `json:"cum_exec_fee"`     // 累计成交手续费
+	Timestamp      time.Time    `json:"timestamp"`        // 创建时间，only valid for inverse
+	CreateTime     time.Time    `json:"create_time"`      // 创建时间，only valid for linear
+	UpdateTime     time.Time    `json:"update_time"`      // 成交时间，only valid for linear
+	TakeProfit     sjson.Number `json:"take_profit"`      // 止盈价格
+	StopLoss       sjson.Number `json:"stop_loss"`        // 止损价格
+	TrailingStop   sjson.Number `json:"trailing_stop"`    // 追踪止损（与当前价格的距离）
+	TrailingActive sjson.Number `json:"trailing_active"`  // 激活价格
+	LastExecPrice  sjson.Number `json:"last_exec_price"`  // 最近一次成交价格
+	ReduceOnly     bool         `json:"reduce_only"`      // 只减仓
+	PositionIdx    int          `json:"position_idx"`     // 用于在不同仓位模式下标识仓位：0 - 单向持仓，1 - 双向持仓Buy，2 - 双向持仓Sell，only valid for linear
+	CloseOnTrigger bool         `json:"close_on_trigger"` // 触发后平仓，如果下平仓单，请设置为 true，避免因为保证金不足而导致下单失败
 }
 
 type StopOrder struct {
@@ -130,19 +134,19 @@ type StopOrder struct {
 }
 
 type Execution struct {
-	Symbol      string    `json:"symbol"`
-	Side        string    `json:"side"`
-	OrderID     string    `json:"order_id"`
-	ExecID      string    `json:"exec_id"`
-	OrderLinkID string    `json:"order_link_id"`
-	Price       float64   `json:"price,string"`
-	OrderQty    float64   `json:"order_qty"`
-	ExecType    string    `json:"exec_type"`
-	ExecQty     float64   `json:"exec_qty"`
-	ExecFee     float64   `json:"exec_fee,string"`
-	LeavesQty   float64   `json:"leaves_qty"`
-	IsMaker     bool      `json:"is_maker"`
-	TradeTime   time.Time `json:"trade_time"`
+	Symbol      string    `json:"symbol"`          // 合约类型
+	Side        string    `json:"side"`            // 方向
+	OrderID     string    `json:"order_id"`        // 订单ID
+	ExecID      string    `json:"exec_id"`         // 成交ID
+	OrderLinkID string    `json:"order_link_id"`   // 自定义订单ID
+	Price       float64   `json:"price,string"`    // 成交价格
+	OrderQty    float64   `json:"order_qty"`       // 订单数量
+	ExecType    string    `json:"exec_type"`       // 交易类型，Trade/AdlTrade/BustTrade
+	ExecQty     float64   `json:"exec_qty"`        // 成交数量
+	ExecFee     float64   `json:"exec_fee,string"` // 交易手续费
+	LeavesQty   float64   `json:"leaves_qty"`      // 剩余委托数量
+	IsMaker     bool      `json:"is_maker"`        // 是否是maker
+	TradeTime   time.Time `json:"trade_time"`      // 交易时间
 }
 
 type Position struct {
