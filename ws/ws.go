@@ -41,7 +41,7 @@ const (
 	WSOrderBook25L1 = "orderBookL2_25" // 新版25档orderBook: order_book_25L1.BTCUSD
 	WSKLine         = "kline"          // K线: kline.BTCUSD.1m
 	WSKLineV2       = "klineV2"        // V2版本K线: klineV2.1.BTCUSD
-	WSKCandle       = "candle"         // USDT永续K线: candle.1.BTCUSDT
+	WSCandle        = "candle"         // USDT永续K线: candle.1.BTCUSDT
 	WSTrade         = "trade"          // 实时交易: trade/trade.BTCUSD
 	WSInsurance     = "insurance"      // 每日保险基金更新: insurance
 	WSInstrument    = "instrument"     // 产品最新行情: instrument
@@ -294,7 +294,7 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) error {
 				return err
 			}
 			b.processTrade(symbol, data...)
-		} else if strings.HasPrefix(topic, WSKCandle) {
+		} else if strings.HasPrefix(topic, WSCandle) {
 			// candle.1.BTCUSDT
 			topicArray := strings.Split(topic, ".")
 			if len(topicArray) != 3 {

@@ -37,7 +37,7 @@ func (b *ByBitWS) processKLineV2(symbol string, data []*KLineV2) {
 }
 
 func (b *ByBitWS) processCandle(symbol string, data []*KLineV2) {
-	b.Emit(WSKCandle, symbol, data)
+	b.Emit(WSCandle, symbol, data)
 }
 
 func (b *ByBitWS) processInsurance(currency string, data ...*Insurance) {
