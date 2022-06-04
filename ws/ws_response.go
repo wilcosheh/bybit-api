@@ -7,7 +7,7 @@ import (
 )
 
 type OrderBookL2 struct {
-	ID     int64   `json:"id"`
+	ID     int64   `json:"id,string"`
 	Price  float64 `json:"price,string"`
 	Side   string  `json:"side"`
 	Size   int64   `json:"size"`
