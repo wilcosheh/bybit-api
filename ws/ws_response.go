@@ -49,19 +49,19 @@ type KLine struct {
 }
 
 type KLineV2 struct {
-	Symbol    string  `json:"symbol"`    // 合约类型，从 topic 解析得到
-	Start     int64   `json:"start"`     // 开始时间戳（秒）
-	End       int64   `json:"end"`       // 结束时间戳（秒）
-	Open      float64 `json:"open"`      // 开盘价
-	Close     float64 `json:"close"`     // 收盘价
-	High      float64 `json:"high"`      // 最高价格
-	Low       float64 `json:"low"`       // 最低价格
-	Volume    float64 `json:"volume"`    // 交易量
-	Turnover  float64 `json:"turnover"`  // 成交金额 0.0013844
-	Confirm   bool    `json:"confirm"`   // 是否确认，为 true 表明是 k 线 最后一个 tick，否则只是一个快照数据，即中间价格
-	CrossSeq  int     `json:"cross_seq"` // 版本号
-	Interval  string  `json:"interval"`  // 周期，从 topic 解析得到： 1 3 5 15 30 60 120 240 360 D W M
-	Timestamp int64   `json:"timestamp"` // 结束时间戳（秒）
+	Symbol    string  `json:"symbol"`          // 合约类型，从 topic 解析得到
+	Start     int64   `json:"start"`           // 开始时间戳（秒）
+	End       int64   `json:"end"`             // 结束时间戳（秒）
+	Open      float64 `json:"open"`            // 开盘价
+	Close     float64 `json:"close"`           // 收盘价
+	High      float64 `json:"high"`            // 最高价格
+	Low       float64 `json:"low"`             // 最低价格
+	Volume    float64 `json:"volume,string"`   // 交易量 TODO: 反向永续类型不一样
+	Turnover  float64 `json:"turnover,string"` // 成交金额 0.0013844 TODO: 反向永续类型不一样
+	Confirm   bool    `json:"confirm"`         // 是否确认，为 true 表明是 k 线 最后一个 tick，否则只是一个快照数据，即中间价格
+	CrossSeq  int     `json:"cross_seq"`       // 版本号
+	Interval  string  `json:"interval"`        // 周期，从 topic 解析得到： 1 3 5 15 30 60 120 240 360 D W M
+	Timestamp int64   `json:"timestamp"`       // 结束时间戳（秒）
 }
 
 type Insurance struct {
