@@ -27,14 +27,18 @@ const (
 // https://github.com/bybit-exchange/bybit-official-api-docs/blob/master/zh_cn/websocket.md
 
 // 测试网地址
-// wss://stream-testnet.bybit.com/realtime
+// wss://stream-testnet.bybit.com/realtime_public
+// wss://stream-testnet.bybit.com/realtime_private
 
 // 主网地址
-// wss://stream.bybit.com/realtime
+// wss://stream.bybit.com/realtime_public
+// wss://stream.bybit.com/realtime_private
 
 const (
-	HostReal    = "wss://stream.bybit.com/realtime"
-	HostTestnet = "wss://stream-testnet.bybit.com/realtime"
+	HostRealPublic     = "wss://stream.bybit.com/realtime_public"
+	HostRealPrivate    = "wss://stream.bybit.com/realtime_private"
+	HostTestnetPublic  = "wss://stream-testnet.bybit.com/realtime_public"
+	HostTestnetPrivate = "wss://stream-testnet.bybit.com/realtime_private"
 )
 
 const (
@@ -272,6 +276,7 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) error {
 			switch type_ {
 			case "snapshot":
 				var data []*OrderBookL2
+				raw = ret.Get("data.order_book").Raw
 				err := json.Unmarshal([]byte(raw), &data)
 				if err != nil {
 					return err

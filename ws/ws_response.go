@@ -10,7 +10,7 @@ type OrderBookL2 struct {
 	ID     int64   `json:"id,string"`
 	Price  float64 `json:"price,string"`
 	Side   string  `json:"side"`
-	Size   int64   `json:"size"`
+	Size   float64 `json:"size"`
 	Symbol string  `json:"symbol"`
 }
 
@@ -28,7 +28,7 @@ type Trade struct {
 	Timestamp     time.Time `json:"timestamp"`
 	Symbol        string    `json:"symbol"`
 	Side          string    `json:"side"`
-	Size          int       `json:"size"`
+	Size          float64   `json:"size"`
 	Price         float64   `json:"price"`
 	TickDirection string    `json:"tick_direction"`
 	TradeID       string    `json:"trade_id"`

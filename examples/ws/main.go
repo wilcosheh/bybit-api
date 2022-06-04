@@ -7,45 +7,51 @@ import (
 )
 
 func main() {
-	cfg := &ws.Configuration{
-		Addr:          ws.HostTestnet, // 测试网络
+
+	wsPublic := ws.New(&ws.Configuration{
+		Addr:          ws.HostRealPublic, // 测试网络
+		AutoReconnect: true,              // 断线自动重连
+		DebugMode:     true,
+	})
+	wsPrivate := ws.New(&ws.Configuration{
+		Addr:          ws.HostRealPrivate, // 测试网络
 		ApiKey:        "wKuYtkeNdC2PaMKjoy",
 		SecretKey:     "5ekcDn3KnKoCRbfvrPImYzVdx7Ri2hhVxkmw",
 		AutoReconnect: true, // 断线自动重连
 		DebugMode:     true,
-	}
-	b := ws.New(cfg)
+	})
 
 	// 订阅新版25档orderBook
-	b.Subscribe(ws.WSOrderBook25L1 + ".BTCUSD")
+	wsPublic.Subscribe(ws.WSOrderBook25L1 + ".ETHUSDT")
 	// 实时交易
-	//b.Subscribe("trade.BTCUSD")
-	b.Subscribe(ws.WSTrade) // BTCUSD/ETHUSD/EOSUSD/XRPUSD
+	wsPublic.Subscribe("trade.BTCUSD")
+	wsPublic.Subscribe(ws.WSTrade) // BTCUSD/ETHUSD/EOSUSD/XRPUSD
 	// K线
-	b.Subscribe(ws.WSKLineV2 + ".1.BTCUSD")
+	wsPublic.Subscribe(ws.WSKLineV2 + ".1.BTCUSD")
 	// 每日保险基金更新
-	b.Subscribe(ws.WSInsurance)
+	wsPublic.Subscribe(ws.WSInsurance)
 	// 产品最新行情
-	b.Subscribe(ws.WSInstrument + ".BTCUSD")
+	wsPublic.Subscribe(ws.WSInstrument + ".BTCUSD")
 
 	// 仓位变化
-	b.Subscribe(ws.WSPosition)
+	wsPrivate.Subscribe(ws.WSPosition)
 	// 委托单成交信息
-	b.Subscribe(ws.WSExecution)
+	wsPrivate.Subscribe(ws.WSExecution)
 	// 委托单的更新
-	b.Subscribe(ws.WSOrder)
+	wsPrivate.Subscribe(ws.WSOrder)
 
-	b.On(ws.WSOrderBook25L1, handleOrderBook)
-	b.On(ws.WSTrade, handleTrade)
-	b.On(ws.WSKLineV2, handleKLineV2)
-	b.On(ws.WSInsurance, handleInsurance)
-	b.On(ws.WSInstrument, handleInstrument)
+	wsPublic.On(ws.WSOrderBook25L1, handleOrderBook)
+	wsPublic.On(ws.WSTrade, handleTrade)
+	wsPublic.On(ws.WSKLineV2, handleKLineV2)
+	wsPublic.On(ws.WSInsurance, handleInsurance)
+	wsPublic.On(ws.WSInstrument, handleInstrument)
 
-	b.On(ws.WSPosition, handlePosition)
-	b.On(ws.WSExecution, handleExecution)
-	b.On(ws.WSOrder, handleOrder)
+	wsPrivate.On(ws.WSPosition, handlePosition)
+	wsPrivate.On(ws.WSExecution, handleExecution)
+	wsPrivate.On(ws.WSOrder, handleOrder)
 
-	b.Start()
+	wsPublic.Start()
+	wsPrivate.Start()
 
 	forever := make(chan struct{})
 	<-forever
