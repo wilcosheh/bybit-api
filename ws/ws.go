@@ -55,6 +55,7 @@ const (
 	WSExecution = "execution"  // 委托单成交信息: execution
 	WSOrder     = "order"      // 委托单的更新: order
 	WSStopOrder = "stop_order" // 条件单的更新: stop_order
+	WSWallet    = "wallet"     // 条件单的更新: stop_order
 
 	WSDisconnected = "disconnected" // WS断开事件
 )
@@ -430,6 +431,14 @@ func (b *ByBitWS) processMessage(messageType int, data []byte) error {
 				return err
 			}
 			b.processStopOrder(data...)
+		} else if topic == WSWallet {
+			raw := ret.Get("data").Raw
+			var data []*Wallet
+			err := json.Unmarshal([]byte(raw), &data)
+			if err != nil {
+				return err
+			}
+			b.processWallet(data...)
 		}
 		return nil
 	}

@@ -67,3 +67,7 @@ func (b *ByBitWS) processOrder(data ...*Order) {
 func (b *ByBitWS) processStopOrder(data ...*StopOrder) {
 	b.Emit(WSStopOrder, data)
 }
+
+func (b *ByBitWS) processWallet(data ...*Wallet) {
+	b.Emit(WSWallet, data)
+}

@@ -85,32 +85,32 @@ type Liquidation struct {
 }
 
 type Order struct {
-	OrderID        string       `json:"order_id"`         // 订单ID
-	OrderLinkID    string       `json:"order_link_id"`    // 自定义订单ID
-	Symbol         string       `json:"symbol"`           // 合约类型
-	Side           string       `json:"side"`             // 方向
-	OrderType      string       `json:"order_type"`       // 委托单价格类型，Limit/Market
-	Price          sjson.Number `json:"price"`            // 委托价格
-	Qty            float64      `json:"qty"`              // 委托数量
-	TimeInForce    string       `json:"time_in_force"`    // 执行策略，GoodTillCancel/ImmediateOrCancel/FillOrKill/PostOnly
-	CreateType     string       `json:"create_type"`      // 下单操作的触发场景
-	CancelType     string       `json:"cancel_type"`      // 取消操作的触发场景
-	OrderStatus    string       `json:"order_status"`     // 订单状态
-	LeavesQty      float64      `json:"leaves_qty"`       // 剩余委托数量
-	CumExecQty     float64      `json:"cum_exec_qty"`     // 累计成交数量
-	CumExecValue   sjson.Number `json:"cum_exec_value"`   // 累计成交价值
-	CumExecFee     sjson.Number `json:"cum_exec_fee"`     // 累计成交手续费
-	Timestamp      time.Time    `json:"timestamp"`        // 创建时间，only valid for inverse
-	CreateTime     time.Time    `json:"create_time"`      // 创建时间，only valid for linear
-	UpdateTime     time.Time    `json:"update_time"`      // 成交时间，only valid for linear
-	TakeProfit     sjson.Number `json:"take_profit"`      // 止盈价格
-	StopLoss       sjson.Number `json:"stop_loss"`        // 止损价格
-	TrailingStop   sjson.Number `json:"trailing_stop"`    // 追踪止损（与当前价格的距离）
-	TrailingActive sjson.Number `json:"trailing_active"`  // 激活价格
-	LastExecPrice  sjson.Number `json:"last_exec_price"`  // 最近一次成交价格
-	ReduceOnly     bool         `json:"reduce_only"`      // 只减仓
-	PositionIdx    int          `json:"position_idx"`     // 用于在不同仓位模式下标识仓位：0 - 单向持仓，1 - 双向持仓Buy，2 - 双向持仓Sell，only valid for linear
-	CloseOnTrigger bool         `json:"close_on_trigger"` // 触发后平仓，如果下平仓单，请设置为 true，避免因为保证金不足而导致下单失败
+	OrderID        string       `json:"order_id"`            // 订单ID
+	OrderLinkID    string       `json:"order_link_id"`       // 自定义订单ID
+	Symbol         string       `json:"symbol"`              // 合约类型
+	Side           string       `json:"side"`                // 方向
+	OrderType      string       `json:"order_type"`          // 委托单价格类型，Limit/Market
+	Price          sjson.Number `json:"price"`               // 委托价格
+	Qty            float64      `json:"qty"`                 // 委托数量
+	TimeInForce    string       `json:"time_in_force"`       // 执行策略，GoodTillCancel/ImmediateOrCancel/FillOrKill/PostOnly
+	CreateType     string       `json:"create_type"`         // 下单操作的触发场景
+	CancelType     string       `json:"cancel_type"`         // 取消操作的触发场景
+	OrderStatus    string       `json:"order_status"`        // 订单状态
+	LeavesQty      float64      `json:"leaves_qty"`          // 剩余委托数量
+	CumExecQty     float64      `json:"cum_exec_qty"`        // 累计成交数量
+	CumExecValue   sjson.Number `json:"cum_exec_value"`      // 累计成交价值
+	CumExecFee     sjson.Number `json:"cum_exec_fee"`        // 累计成交手续费
+	Timestamp      time.Time    `json:"timestamp"`           // 创建时间，only valid for inverse
+	CreateTime     time.Time    `json:"create_time"`         // 创建时间，only valid for linear
+	UpdateTime     time.Time    `json:"update_time"`         // 成交时间，only valid for linear
+	TakeProfit     sjson.Number `json:"take_profit"`         // 止盈价格
+	StopLoss       sjson.Number `json:"stop_loss"`           // 止损价格
+	TrailingStop   sjson.Number `json:"trailing_stop"`       // 追踪止损（与当前价格的距离）
+	TrailingActive sjson.Number `json:"trailing_active"`     // 激活价格
+	LastExecPrice  sjson.Number `json:"last_exec_price"`     // 最近一次成交价格
+	ReduceOnly     bool         `json:"reduce_only"`         // 只减仓
+	PositionIdx    int          `json:"position_idx,string"` // 用于在不同仓位模式下标识仓位：0 - 单向持仓，1 - 双向持仓Buy，2 - 双向持仓Sell，only valid for linear
+	CloseOnTrigger bool         `json:"close_on_trigger"`    // 触发后平仓，如果下平仓单，请设置为 true，避免因为保证金不足而导致下单失败
 }
 
 type StopOrder struct {
@@ -134,47 +134,57 @@ type StopOrder struct {
 }
 
 type Execution struct {
-	Symbol      string    `json:"symbol"`          // 合约类型
-	Side        string    `json:"side"`            // 方向
-	OrderID     string    `json:"order_id"`        // 订单ID
-	ExecID      string    `json:"exec_id"`         // 成交ID
-	OrderLinkID string    `json:"order_link_id"`   // 自定义订单ID
-	Price       float64   `json:"price,string"`    // 成交价格
-	OrderQty    float64   `json:"order_qty"`       // 订单数量
-	ExecType    string    `json:"exec_type"`       // 交易类型，Trade/AdlTrade/BustTrade
-	ExecQty     float64   `json:"exec_qty"`        // 成交数量
-	ExecFee     float64   `json:"exec_fee,string"` // 交易手续费
-	LeavesQty   float64   `json:"leaves_qty"`      // 剩余委托数量
-	IsMaker     bool      `json:"is_maker"`        // 是否是maker
-	TradeTime   time.Time `json:"trade_time"`      // 交易时间
+	Symbol      string    `json:"symbol"`        // 合约类型
+	Side        string    `json:"side"`          // 方向
+	OrderID     string    `json:"order_id"`      // 订单ID
+	ExecID      string    `json:"exec_id"`       // 成交ID
+	OrderLinkID string    `json:"order_link_id"` // 自定义订单ID
+	Price       float64   `json:"price"`         // 成交价格
+	OrderQty    float64   `json:"order_qty"`     // 订单数量
+	ExecType    string    `json:"exec_type"`     // 交易类型，Trade/AdlTrade/BustTrade
+	ExecQty     float64   `json:"exec_qty"`      // 成交数量
+	ExecFee     float64   `json:"exec_fee"`      // 交易手续费
+	LeavesQty   float64   `json:"leaves_qty"`    // 剩余委托数量
+	IsMaker     bool      `json:"is_maker"`      // 是否是maker
+	TradeTime   time.Time `json:"trade_time"`    // 交易时间
 }
 
 type Position struct {
-	UserID           int64   `json:"user_id"`
-	Symbol           string  `json:"symbol"`
-	Size             float64 `json:"size"`
-	Side             string  `json:"side"`
-	PositionValue    float64 `json:"position_value,string"`
-	EntryPrice       float64 `json:"entry_price,string"`
-	LiqPrice         float64 `json:"liq_price,string"`
-	BustPrice        float64 `json:"bust_price,string"`
-	Leverage         float64 `json:"leverage,string"`
-	OrderMargin      float64 `json:"order_margin,string"`
-	PositionMargin   float64 `json:"position_margin,string"`
-	AvailableBalance float64 `json:"available_balance,string"`
-	TakeProfit       float64 `json:"take_profit,string"`
-	TpTriggerBy      string  `json:"tp_trigger_by"`
-	StopLoss         float64 `json:"stop_loss,string"`
-	SlTriggerBy      string  `json:"sl_trigger_by"`
-	RealisedPnl      float64 `json:"realised_pnl,string"`
-	TrailingStop     float64 `json:"trailing_stop,string"`
-	TrailingActive   float64 `json:"trailing_active,string"`
-	WalletBalance    float64 `json:"wallet_balance,string"`
-	RiskID           int     `json:"risk_id"`
-	OccClosingFee    float64 `json:"occ_closing_fee,string"`
-	OccFundingFee    float64 `json:"occ_funding_fee,string"`
-	AutoAddMargin    int     `json:"auto_add_margin"`
-	CumRealisedPnl   float64 `json:"cum_realised_pnl,string"`
-	PositionStatus   string  `json:"position_status"`
-	PositionSeq      int64   `json:"position_seq"`
+	UserID         int64   `json:"user_id,string"`      // 用户 ID
+	Symbol         string  `json:"symbol"`              // 合约类型
+	Size           float64 `json:"size"`                // 仓位数量
+	Side           string  `json:"side"`                // 方向
+	PositionValue  float64 `json:"position_value"`      // 仓位价值
+	EntryPrice     float64 `json:"entry_price"`         // 平均入场价
+	LiqPrice       float64 `json:"liq_price"`           // 强平价格
+	BustPrice      float64 `json:"bust_price"`          // 破产价格
+	Leverage       float64 `json:"leverage"`            // 逐仓模式下，值为一哦哪个好设置的杠杆；全仓模式下，值为当前风险限额下最大杠杆
+	OrderMargin    float64 `json:"order_margin"`        // 委托预占用保证金
+	PositionMargin float64 `json:"position_margin"`     // 仓位保证金
+	OccClosingFee  float64 `json:"occ_closing_fee"`     // 仓位占用的平仓手续费
+	TakeProfit     float64 `json:"take_profit"`         // 止盈价格
+	TpTriggerBy    string  `json:"tp_trigger_by"`       // 止盈激活价格类型，默认为 LastPrice
+	StopLoss       float64 `json:"stop_loss"`           // 止损价格
+	SlTriggerBy    string  `json:"sl_trigger_by"`       // 止损激活价格类型
+	RealisedPnl    float64 `json:"realised_pnl"`        // 当日已结盈亏
+	CumRealisedPnl float64 `json:"cum_realised_pnl"`    // 累计已结盈亏
+	PositionStatus string  `json:"position_status"`     // 仓位状态：正常、强平、减仓
+	PositionSeq    int64   `json:"position_seq,string"` // 仓位变化版本号
+	PositionIdx    int     `json:"position_idx,string"` // 用于在不同仓位模式下标识仓位：0 - 单向持仓，1 - 双向持仓Buy，2 - 双向持仓Sell，only valid for linear
+	Mode           string  `json:"mode"`                // 仓位模式： MergedSingle or BothSide
+	Isolated       bool    `json:"isolated"`            // 是否逐仓，true-逐仓 false-全仓
+	RiskID         int     `json:"risk_id,string"`      // 风险限额 ID
+
+	// 反向永续字段
+	TrailingStop     float64 `json:"trailing_stop"` //
+	TrailingActive   float64 `json:"trailing_active"`
+	WalletBalance    float64 `json:"wallet_balance"`
+	AvailableBalance float64 `json:"available_balance"`
+	OccFundingFee    float64 `json:"occ_funding_fee"`
+	AutoAddMargin    int     `json:"auto_add_margin,string"`
+}
+
+type Wallet struct {
+	WalletBalance    float64 `json:"wallet_balance"`
+	AvailableBalance float64 `json:"available_balance"`
 }

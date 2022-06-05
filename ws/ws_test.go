@@ -1,14 +1,15 @@
 package ws
 
 import (
-	"github.com/tidwall/gjson"
 	"log"
 	"testing"
+
+	"github.com/tidwall/gjson"
 )
 
 func TestConnect(t *testing.T) {
 	cfg := &Configuration{
-		Addr: HostTestnet,
+		Addr: HostTestnetPublic,
 		//ApiKey:        "wKuYtkeNdC2PaMKjoy",
 		//SecretKey:     "5ekcDn3KnKoCRbfvrPImYzVdx7Ri2hhVxkmw",
 		ApiKey:        "6IASD6KDBdunn5qLpT",
@@ -56,19 +57,17 @@ func handleOrder(data []*Order) {
 	log.Printf("handleOrder %v", data)
 }
 
-func TestOrderBookL2(t *testing.T) {
+func TestPublic(t *testing.T) {
 	cfg := &Configuration{
-		Addr:          HostTestnet,
+		Addr:          HostTestnetPublic,
 		Proxy:         "http://127.0.0.1:1081",
-		ApiKey:        "rwEwhfC6mDFYIGfcyb",
-		SecretKey:     "yfNJSzGapfFwbJyvguAyVXLJSIOCIegBg42Z",
 		AutoReconnect: true,
 		DebugMode:     true,
 	}
 	b := New(cfg)
 
 	// 订阅新版25档orderBook
-	b.Subscribe(WSOrderBook25L1 + ".BTCUSD")
+	b.Subscribe(WSOrderBook25L1 + ".BTCUSDT")
 
 	b.On(WSOrderBook25L1, handleOrderBook)
 
@@ -98,7 +97,22 @@ func TestOrderBookL2(t *testing.T) {
 
 	b.On(WSInstrument, handleInstrument)
 
-	// 私有类
+	b.Start()
+
+	forever := make(chan struct{})
+	<-forever
+}
+func TestPrivate(t *testing.T) {
+	cfg := &Configuration{
+		Addr:          HostTestnetPrivate,
+		Proxy:         "http://127.0.0.1:1081",
+		ApiKey:        "rwEwhfC6mDFYIGfcyb",
+		SecretKey:     "yfNJSzGapfFwbJyvguAyVXLJSIOCIegBg42Z",
+		AutoReconnect: true,
+		DebugMode:     true,
+	}
+
+	b := New(cfg)
 
 	// 仓位变化
 	b.Subscribe(WSPosition)
